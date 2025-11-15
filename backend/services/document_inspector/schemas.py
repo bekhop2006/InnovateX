@@ -48,3 +48,16 @@ class HealthResponse(BaseModel):
     model_loaded: bool = Field(..., description="Whether YOLO model is loaded")
     model_path: Optional[str] = Field(None, description="Path to loaded model")
 
+
+class ProcessDocumentElement(BaseModel):
+    """Single element found in document."""
+    type: str = Field(..., description="Element type: qrcode, stamp, or signature")
+    bbox: List[int] = Field(..., description="Bounding box coordinates [x1, y1, x2, y2]")
+    content: str = Field(..., description="Content of the element (decoded QR, OCR text, or 'Detected')")
+
+
+class ProcessDocumentResponse(BaseModel):
+    """Response for process_document endpoint."""
+    status: str = Field(..., description="Processing status")
+    elements: List[ProcessDocumentElement] = Field(default_factory=list, description="List of found elements")
+

@@ -112,6 +112,12 @@ try:
 except ImportError:
     print("⚠️  Document Inspector router not found")
 
+try:
+    from services.document_inspector.process_router import router as process_document_router
+    app.include_router(process_document_router, prefix="/api", tags=["Document Processing"])
+except ImportError:
+    print("⚠️  Process Document router not found")
+
 
 if __name__ == "__main__":
     import uvicorn

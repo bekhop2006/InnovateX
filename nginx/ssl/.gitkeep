@@ -1,0 +1,10 @@
+# SSL certificates directory
+# Place your SSL certificates here for HTTPS in production
+#
+# Files needed:
+# - cert.pem (SSL certificate)
+# - key.pem (Private key)
+#
+# You can generate self-signed certificates for testing:
+# openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem
+
