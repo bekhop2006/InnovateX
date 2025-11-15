@@ -107,48 +107,6 @@ except ImportError:
     print("⚠️  Cart router not found")
 
 try:
-    from services.crypto.router import router as crypto_router
-    app.include_router(crypto_router, prefix="/api/crypto", tags=["Crypto"])
-except ImportError:
-    print("⚠️  Crypto router not found")
-
-try:
-    from faceid.router import router as faceid_router
-    app.include_router(faceid_router, prefix="/api/faceid", tags=["Face ID"])
-except ImportError:
-    print("⚠️  Face ID router not found")
-
-try:
-    from rag_agent.routes.router import router as rag_router
-    app.include_router(rag_router, prefix="/api/rag", tags=["RAG System"])
-except ImportError:
-    print("⚠️  RAG router not found")
-
-try:
-    from rag_agent.routes.live_query_router import router as live_query_router
-    app.include_router(live_query_router, prefix="/api/rag", tags=["RAG Live"])
-except ImportError:
-    print("⚠️  RAG Live router not found")
-
-try:
-    from rag_agent.routes.transaction_router import router as rag_transaction_router
-    app.include_router(rag_transaction_router, prefix="/api", tags=["RAG Transactions"])
-except ImportError:
-    print("⚠️  RAG Transaction router not found")
-
-try:
-    from predict.router import router as predict_router
-    app.include_router(predict_router, prefix="/api/predict", tags=["Predictions"])
-except ImportError:
-    print("⚠️  Predict router not found")
-
-try:
-    from routers.game_rewards import router as game_rewards_router
-    app.include_router(game_rewards_router, prefix="/api", tags=["Game Rewards"])
-except ImportError:
-    print("⚠️  Game Rewards router not found")
-
-try:
     from services.document_inspector.router import router as document_inspector_router
     app.include_router(document_inspector_router, prefix="/api/document-inspector", tags=["Document Inspector"])
 except ImportError:
