@@ -32,19 +32,25 @@ def save_scan(
     Returns:
         Created ScanHistory entry
     """
-    # Create user directory if it doesn't exist
-    user_dir = f"uploads/scans/{user_id}"
-    os.makedirs(user_dir, exist_ok=True)
-    
-    # Generate unique filename
+    store_db = os.getenv("STORE_PDF_IN_DB", "false").lower() == "true"
+    # Prepare paths / names
     timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
     filename = f"{timestamp}_{file.filename}"
-    file_path = os.path.join(user_dir, filename)
+    user_dir = f"uploads/scans/{user_id}"
+    if not store_db:
+        os.makedirs(user_dir, exist_ok=True)
+        file_path = os.path.join(user_dir, filename)
+    else:
+        file_path = f"db://{user_id}/{filename}"
     
     try:
-        # Save PDF file
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+        file_bytes = None
+        if store_db:
+            file.file.seek(0)
+            file_bytes = file.file.read()
+        else:
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
         
         # Count detections by category
         qr_count = 0
@@ -66,6 +72,8 @@ def save_scan(
             user_id=user_id,
             document_name=file.filename,
             file_path=file_path,
+            file_mime="application/pdf",
+            file_data=file_bytes,
             total_pages=results.get("total_pages", 0),
             qr_count=qr_count,
             signature_count=signature_count,
@@ -82,7 +90,7 @@ def save_scan(
         
     except Exception as e:
         # Clean up file if database insert fails
-        if os.path.exists(file_path):
+        if not store_db and os.path.exists(file_path):
             os.remove(file_path)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -1,7 +1,7 @@
 """
 ScanHistory model - stores document scan results and metadata.
 """
-from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, JSON
+from sqlalchemy import Column, Integer, String, DateTime, Float, ForeignKey, JSON, LargeBinary
 from sqlalchemy.orm import relationship
 from datetime import datetime, timedelta
 from database import Base
@@ -20,7 +20,9 @@ class ScanHistory(Base):
     
     # Document Information
     document_name = Column(String(255), nullable=False)
-    file_path = Column(String(500), nullable=False)  # Path to stored PDF file
+    file_path = Column(String(500), nullable=False)  # Path to stored PDF file or placeholder when stored in DB
+    file_mime = Column(String(100), nullable=True, default="application/pdf")
+    file_data = Column(LargeBinary, nullable=True)  # Raw PDF bytes when stored in DB
     
     # Scan Metadata
     scan_date = Column(DateTime, default=datetime.utcnow, nullable=False)

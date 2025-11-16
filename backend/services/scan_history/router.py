@@ -2,7 +2,7 @@
 Scan History router - API endpoints for scan history management.
 """
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -86,9 +86,18 @@ async def download_scan_pdf(
     Requires authentication.
     Returns the PDF file.
     """
-    file_path = get_scan_file_path(scan_id, current_user.id, db)
     scan = get_scan_by_id(scan_id, current_user.id, db)
-    
+    # If stored in DB, stream bytes
+    if getattr(scan, 'file_data', None):
+        return StreamingResponse(
+            iter([scan.file_data]),
+            media_type=scan.file_mime or "application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={scan.document_name}"
+            }
+        )
+    # Fallback to filesystem
+    file_path = get_scan_file_path(scan_id, current_user.id, db)
     return FileResponse(
         path=file_path,
         filename=scan.document_name,

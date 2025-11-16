@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 
-from database import create_tables
+from database import create_tables, ensure_scan_history_blob_columns
 
 # Load environment variables
 load_dotenv()
@@ -45,6 +45,7 @@ async def startup_event():
     
     # Create database tables
     create_tables()
+    ensure_scan_history_blob_columns()
     print("✅ Database tables created/verified")
     
     # Start cleanup scheduler

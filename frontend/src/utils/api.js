@@ -2,7 +2,7 @@
  * API Client with JWT token support
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL) ? import.meta.env.VITE_API_URL : '';
 
 class ApiClient {
   constructor() {
@@ -215,6 +215,31 @@ class ApiClient {
     return await this.request(`/api/scans/${scanId}`, {
       method: 'DELETE',
     });
+  }
+
+  async downloadScanPdf(scanId) {
+    const endpoint = `/api/scans/${scanId}/download`;
+    const url = API_BASE_URL ? `${API_BASE_URL}${endpoint}` : endpoint;
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: this.getHeaders(null),
+    });
+    if (!res.ok) {
+      let detail = 'Request failed';
+      try {
+        const d = await res.json();
+        detail = d.detail || detail;
+      } catch {}
+      throw new Error(detail);
+    }
+    const cd = res.headers.get('content-disposition');
+    let filename;
+    if (cd) {
+      const match = cd.match(/filename="?([^";]+)"?/i);
+      if (match) filename = match[1];
+    }
+    const blob = await res.blob();
+    return { blob, filename };
   }
 
   /**

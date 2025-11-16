@@ -3,6 +3,7 @@ Database configuration and session management.
 """
 import os
 from sqlalchemy import create_engine
+from sqlalchemy import inspect, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
@@ -51,6 +52,27 @@ def get_db():
 def create_tables():
     """Create all tables in the database."""
     Base.metadata.create_all(bind=engine)
+
+
+def ensure_scan_history_blob_columns():
+    """Ensure scan_history has file_data and file_mime columns for DB storage of PDFs."""
+    try:
+        inspector = inspect(engine)
+        cols = {c['name'] for c in inspector.get_columns('scan_history')}
+        dialect = engine.dialect.name
+        with engine.begin() as conn:
+            if 'file_mime' not in cols:
+                if dialect == 'postgresql':
+                    conn.execute(text('ALTER TABLE scan_history ADD COLUMN file_mime VARCHAR(100)'))
+                else:
+                    conn.execute(text('ALTER TABLE scan_history ADD COLUMN file_mime VARCHAR(100)'))
+            if 'file_data' not in cols:
+                if dialect == 'postgresql':
+                    conn.execute(text('ALTER TABLE scan_history ADD COLUMN file_data BYTEA'))
+                else:
+                    conn.execute(text('ALTER TABLE scan_history ADD COLUMN file_data BLOB'))
+    except Exception:
+        pass
 
 
 def drop_tables():
