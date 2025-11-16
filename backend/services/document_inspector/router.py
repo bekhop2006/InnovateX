@@ -62,12 +62,7 @@ async def detect_elements(
         If authenticated and save_history=True, the scan will be saved to user's history.
         Anonymous users can still use the service, but results won't be saved.
     """
-    # Check if service is ready
-    if not service.is_ready():
-        raise HTTPException(
-            status_code=503,
-            detail="Model not loaded. Please ensure the YOLOv8 model is trained and available."
-        )
+    # If model is not loaded, we'll still process pages and return empty detections
     
     # Validate file type
     if not file.filename.lower().endswith('.pdf'):

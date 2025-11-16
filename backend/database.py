@@ -11,16 +11,23 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/innovatex_db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./innovatex.db")
 
 # Create SQLAlchemy engine
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,  # Verify connections before using them
-    pool_size=10,
-    max_overflow=20,
-    echo=os.getenv("DEBUG", "False").lower() == "true"  # Log SQL queries in debug mode
-)
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False},
+        echo=os.getenv("DEBUG", "False").lower() == "true"
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20,
+        echo=os.getenv("DEBUG", "False").lower() == "true"
+    )
 
 # Create SessionLocal class
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

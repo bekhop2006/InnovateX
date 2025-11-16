@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import api from './utils/api'
 import UploadCard from './components/UploadCard.jsx'
 import MultiUploadCard from './components/MultiUploadCard.jsx'
 import ResultsPanel from './components/ResultsPanel.jsx'
@@ -54,24 +55,13 @@ const App = () => {
       // Try backend API first, fallback to local example.json
       const json = await (async () => {
         try {
-          const form = new FormData()
-          form.append('file', file)
-          const res = await fetch('http://localhost:8000/api/document-inspector/detect?conf_threshold=0.5', {
-            method: 'POST',
-            body: form,
-          })
-          if (!res.ok) {
-            const errorData = await res.json().catch(() => ({}))
-            throw new Error(errorData.detail || `Backend error: ${res.status}`)
-          }
-          return await res.json()
+          const data = await api.scanDocument(file, 0.5, true)
+          return data
         } catch (e) {
           console.warn('Backend not available, using example data:', e.message)
-          // Backend not ready: load local example.json
           const res = await fetch('/example.json')
           if (!res.ok) throw new Error('Backend unavailable and local example not found')
           const exampleData = await res.json()
-          // Convert old format to new format for compatibility
           return convertOldFormat(exampleData)
         }
       })()
@@ -111,20 +101,16 @@ const App = () => {
         
         setProgress(prev => ({ ...prev, [i]: 30 }))
         
-        const res = await fetch('http://localhost:8000/api/document-inspector/detect?conf_threshold=0.5', {
-          method: 'POST',
-          body: form,
-        })
+        let resJson
+        try {
+          resJson = await api.scanDocument(files[i], 0.5, true)
+        } catch (e) {
+          throw e
+        }
         
         setProgress(prev => ({ ...prev, [i]: 70 }))
         
-        if (!res.ok) {
-          const errorData = await res.json().catch(() => ({}))
-          throw new Error(errorData.detail || `Backend error: ${res.status}`)
-        }
-        
-        const json = await res.json()
-        const parsed = parseBackend(json)
+        const parsed = parseBackend(resJson)
         
         if (!parsed) throw new Error('Invalid response format')
         

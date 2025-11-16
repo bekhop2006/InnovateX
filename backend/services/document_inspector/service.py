@@ -48,8 +48,11 @@ class DocumentInspectorService:
             width, height = get_page_size(image)
             page_size = PageSize(width=width, height=height)
             
-            # Detect elements
-            detections = self.detector.detect(image, conf_threshold=conf_threshold)
+            # Detect elements (fallback to empty detections if model not loaded)
+            if self.is_ready():
+                detections = self.detector.detect(image, conf_threshold=conf_threshold)
+            else:
+                detections = []
             
             # Convert to Detection models
             detection_objects = [

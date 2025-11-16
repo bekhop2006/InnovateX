@@ -5,19 +5,9 @@ import { Routes, Route, Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ScanHistory from './ScanHistory';
 import AdminPanel from './AdminPanel';
+import App from '../App.jsx';
 import './Dashboard.scss';
 
-// Import your existing App component for scanning
-// For now, we'll create a placeholder
-const ScanPage = () => {
-  return (
-    <div className="scan-page">
-      <h2>Document Scanner</h2>
-      <p>Your existing document scanner component goes here.</p>
-      <p>This should be your current App.jsx content.</p>
-    </div>
-  );
-};
 
 const Profile = () => {
   const { user } = useAuth();
@@ -77,7 +67,7 @@ const Dashboard = () => {
       <main className="main-content">
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard/scan" replace />} />
-          <Route path="/scan" element={<ScanPage />} />
+          <Route path="/scan" element={<App />} />
           <Route path="/history" element={<ScanHistory />} />
           <Route path="/profile" element={<Profile />} />
           {isAdmin() && (
