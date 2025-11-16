@@ -68,7 +68,7 @@ def get_user_scans_admin(user_id: int, skip: int, limit: int, db: Session) -> Li
         List of scan history entries
     """
     from services.scan_history.service import get_user_scans
-    return get_user_scans(user_id, skip, limit, db)
+    return get_user_scans(user_id, db, skip, limit)
 
 
 def get_system_stats(db: Session) -> SystemStats:

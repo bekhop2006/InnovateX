@@ -37,7 +37,7 @@ async def get_my_scans(
     if limit > 100:
         limit = 100
     
-    return get_user_scans(current_user.id, skip, limit, db)
+    return get_user_scans(current_user.id, db, skip, limit)
 
 
 @router.get("/stats", response_model=ScanHistoryStats)

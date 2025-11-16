@@ -163,7 +163,7 @@ def get_detector() -> DocumentDetector:
     
     if _detector_instance is None:
         # Try to load default model
-        default_model_path = os.path.join("models", "document_inspector_yolo.pt")
+        default_model_path = os.path.join("ml_models", "document_inspector_yolo.pt")
         
         if os.path.exists(default_model_path):
             _detector_instance = DocumentDetector(default_model_path)

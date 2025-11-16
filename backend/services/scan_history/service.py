@@ -92,9 +92,9 @@ def save_scan(
 
 def get_user_scans(
     user_id: int,
+    db: Session,
     skip: int = 0,
-    limit: int = 50,
-    db: Session
+    limit: int = 50
 ) -> List[ScanHistoryList]:
     """
     Get scan history for a user.

@@ -47,7 +47,7 @@ services:
       - "${BACKEND_PORT:-8000}:8000"
     volumes:
       - ./backend:/app
-      - ./models:/app/models
+      - ./models:/app/ml_models
       - ./dataset:/app/dataset
       - backend_uploads:/app/uploads
     depends_on:
