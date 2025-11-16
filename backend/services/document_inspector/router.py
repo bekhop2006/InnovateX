@@ -3,10 +3,16 @@ FastAPI router for Document Inspector API endpoints.
 """
 import os
 import tempfile
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from typing import Optional
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Depends
 from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
 import io
 
+from database import get_db
+from models.user import User
+from services.auth.dependencies import get_current_user_optional
+from services.scan_history.service import save_scan
 from .service import DocumentInspectorService
 from .schemas import DetectionResponse, HealthResponse
 
@@ -36,7 +42,10 @@ async def health_check():
 @router.post("/detect", response_model=DetectionResponse)
 async def detect_elements(
     file: UploadFile = File(..., description="PDF document to analyze"),
-    conf_threshold: float = Query(0.25, ge=0.0, le=1.0, description="Confidence threshold")
+    conf_threshold: float = Query(0.25, ge=0.0, le=1.0, description="Confidence threshold"),
+    save_history: bool = Query(True, description="Save scan to history (requires authentication)"),
+    current_user: Optional[User] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
 ):
     """
     Detect signatures, stamps, and QR codes in a PDF document.
@@ -44,9 +53,14 @@ async def detect_elements(
     Args:
         file: Uploaded PDF file
         conf_threshold: Confidence threshold for detections (0.0-1.0)
+        save_history: Whether to save the scan to history (requires authentication)
         
     Returns:
         JSON with detection results for all pages
+        
+    Note:
+        If authenticated and save_history=True, the scan will be saved to user's history.
+        Anonymous users can still use the service, but results won't be saved.
     """
     # Check if service is ready
     if not service.is_ready():
@@ -71,6 +85,24 @@ async def detect_elements(
     try:
         # Process document
         result = service.process_document(tmp_path, conf_threshold=conf_threshold)
+        result_dict = result.model_dump()
+        
+        # Save to history if user is authenticated and save_history is True
+        if current_user and save_history:
+            # Reset file position for saving
+            file.file.seek(0)
+            
+            try:
+                save_scan(
+                    user_id=current_user.id,
+                    file=file,
+                    results=result_dict,
+                    db=db
+                )
+            except Exception as e:
+                # Log error but don't fail the request
+                print(f"Warning: Failed to save scan to history: {e}")
+        
         return result
     
     except Exception as e:

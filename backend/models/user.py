@@ -1,10 +1,17 @@
 """
 User model - stores user account information.
 """
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Enum as SQLEnum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
+import enum
+
+
+class UserRole(enum.Enum):
+    """User role enumeration."""
+    user = "user"
+    admin = "admin"
 
 
 class User(Base):
@@ -22,6 +29,9 @@ class User(Base):
     phone = Column(String(20), unique=True, nullable=True)
     password_hash = Column(String(255), nullable=False)
     
+    # Role
+    role = Column(SQLEnum(UserRole), default=UserRole.user, nullable=False)
+    
     # Profile
     avatar = Column(String(255), nullable=True)
     
@@ -38,6 +48,7 @@ class User(Base):
     crypto_account = relationship("CryptoAccount", back_populates="user", uselist=False, cascade="all, delete-orphan")
     crypto_trades = relationship("CryptoTrade", back_populates="user", cascade="all, delete-orphan")
     game_rewards = relationship("GameReward", back_populates="user", cascade="all, delete-orphan")
+    scan_history = relationship("ScanHistory", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, name={self.name})>"

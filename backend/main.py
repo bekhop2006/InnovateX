@@ -32,6 +32,7 @@ app.add_middleware(
 
 # Create uploads directory if it doesn't exist
 os.makedirs("uploads/avatars", exist_ok=True)
+os.makedirs("uploads/scans", exist_ok=True)
 
 # Mount static files
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
@@ -46,6 +47,14 @@ async def startup_event():
     create_tables()
     print("✅ Database tables created/verified")
     
+    # Start cleanup scheduler
+    try:
+        from services.scan_history.cleanup import start_cleanup_scheduler
+        start_cleanup_scheduler()
+        print("✅ Cleanup scheduler started")
+    except Exception as e:
+        print(f"⚠️  Failed to start cleanup scheduler: {e}")
+    
     print("✅ Server is ready!")
 
 
@@ -53,6 +62,14 @@ async def startup_event():
 async def shutdown_event():
     """Cleanup on shutdown."""
     print("👋 Shutting down InnovateX Backend...")
+    
+    # Stop cleanup scheduler
+    try:
+        from services.scan_history.cleanup import stop_cleanup_scheduler
+        stop_cleanup_scheduler()
+        print("✅ Cleanup scheduler stopped")
+    except Exception as e:
+        print(f"⚠️  Failed to stop cleanup scheduler: {e}")
 
 
 @app.get("/")
@@ -117,6 +134,18 @@ try:
     app.include_router(process_document_router, prefix="/api", tags=["Document Processing"])
 except ImportError:
     print("⚠️  Process Document router not found")
+
+try:
+    from services.scan_history.router import router as scan_history_router
+    app.include_router(scan_history_router, prefix="/api/scans", tags=["Scan History"])
+except ImportError:
+    print("⚠️  Scan History router not found")
+
+try:
+    from services.admin.router import router as admin_router
+    app.include_router(admin_router, prefix="/api/admin", tags=["Admin"])
+except ImportError:
+    print("⚠️  Admin router not found")
 
 
 if __name__ == "__main__":

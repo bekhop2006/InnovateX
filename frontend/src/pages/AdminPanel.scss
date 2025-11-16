@@ -1,0 +1,232 @@
+.admin-panel {
+  max-width: 1400px;
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    color: #9c27b0;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .admin-stats {
+    margin-bottom: 3rem;
+
+    .stat-group {
+      margin-bottom: 2rem;
+
+      .stat-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+
+        .stat-card {
+          background: white;
+          border: 3px solid black;
+          padding: 1.5rem;
+          text-align: center;
+          box-shadow: 4px 4px 0 black;
+
+          .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+          }
+
+          .stat-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            opacity: 0.7;
+          }
+        }
+      }
+    }
+  }
+
+  .users-table {
+    background: white;
+    border: 3px solid black;
+    overflow-x: auto;
+    box-shadow: 4px 4px 0 black;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background: #1a1a1a;
+        color: white;
+
+        th {
+          padding: 1rem;
+          text-align: left;
+          font-weight: 600;
+          text-transform: uppercase;
+          font-size: 0.9rem;
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 2px solid #f5f5f5;
+
+          &:hover {
+            background: #f9f9f9;
+          }
+
+          td {
+            padding: 1rem;
+
+            &.actions {
+              display: flex;
+              gap: 0.5rem;
+            }
+          }
+        }
+      }
+
+      .role-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border: 2px solid black;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+
+        &.admin {
+          background: #9c27b0;
+          color: white;
+          border-color: #9c27b0;
+        }
+
+        &.user {
+          background: #4caf50;
+          color: white;
+          border-color: #4caf50;
+        }
+      }
+
+      button {
+        padding: 0.5rem 1rem;
+        border: 2px solid black;
+        font-family: inherit;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &.btn-view {
+          background: black;
+          color: white;
+        }
+
+        &.btn-delete {
+          background: #f44336;
+          color: white;
+          border-color: #f44336;
+        }
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 2px 2px 0 black;
+        }
+      }
+    }
+  }
+}
+
+.user-scans-view {
+  max-width: 1000px;
+
+  .back-btn {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 2px solid black;
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 2rem;
+
+    &:hover {
+      background: black;
+      color: white;
+    }
+  }
+
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .user-email {
+    opacity: 0.6;
+    margin-bottom: 2rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border: 3px solid black;
+
+    p {
+      font-size: 1.2rem;
+      opacity: 0.7;
+    }
+  }
+
+  .scans-list {
+    display: grid;
+    gap: 1rem;
+
+    .scan-card {
+      background: white;
+      border: 3px solid black;
+      padding: 1.5rem;
+      box-shadow: 4px 4px 0 black;
+
+      .scan-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h3 {
+          margin: 0;
+          font-size: 1.2rem;
+        }
+
+        .scan-date {
+          opacity: 0.6;
+        }
+      }
+
+      .scan-stats {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+
+        span {
+          padding: 0.25rem 0.5rem;
+          background: #f5f5f5;
+          border: 2px solid black;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
+.loading, .error {
+  padding: 2rem;
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #c62828;
+}
+

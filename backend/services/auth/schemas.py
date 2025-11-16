@@ -52,6 +52,7 @@ class UserRead(BaseModel):
     email: str
     phone: Optional[str]
     avatar: Optional[str]
+    role: str  # 'admin' or 'user'
     created_at: datetime
     updated_at: datetime
     
@@ -80,6 +81,13 @@ class PasswordChange(BaseModel):
         if not re.search(r"\d", v):
             raise ValueError("Password must contain at least one digit")
         return v
+
+
+class TokenResponse(BaseModel):
+    """Schema for JWT token response."""
+    access_token: str
+    token_type: str = "bearer"
+    user: UserRead
 
 
 class AuthResponse(BaseModel):

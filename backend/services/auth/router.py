@@ -9,19 +9,22 @@ import uuid
 from PIL import Image
 
 from database import get_db
+from models.user import User
 from .service import (
     create_user, login_user, get_user_by_id, get_user_by_email,
     update_user, change_password, update_avatar, delete_user
 )
 from .schemas import (
     UserCreate, UserLogin, UserRead, UserUpdate, 
-    PasswordChange, AuthResponse
+    PasswordChange, AuthResponse, TokenResponse
 )
+from .jwt import create_access_token
+from .dependencies import get_current_user, get_current_admin
 
 router = APIRouter()
 
 
-@router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """
     Register a new user.
@@ -32,13 +35,23 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     - **phone**: Phone number (optional, unique)
     - **password**: Password (min 8 characters, must contain letter and digit)
     
-    Returns user data and automatically creates a checking account.
+    Returns JWT token and user data.
     """
     user = await create_user(user_data, db)
-    return AuthResponse(user=user, message="User registered successfully")
+    
+    # Create JWT token
+    access_token = create_access_token(
+        data={"user_id": user.id, "email": user.email, "role": user.role}
+    )
+    
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user=user
+    )
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post("/login", response_model=TokenResponse)
 async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     """
     Login with email and password.
@@ -46,10 +59,20 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
     - **email**: User's email address
     - **password**: User's password
     
-    Returns user data if credentials are valid.
+    Returns JWT token and user data if credentials are valid.
     """
     user = login_user(credentials, db)
-    return AuthResponse(user=user, message="Login successful")
+    
+    # Create JWT token
+    access_token = create_access_token(
+        data={"user_id": user.id, "email": user.email, "role": user.role}
+    )
+    
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user=user
+    )
 
 
 @router.get("/users/{user_id}", response_model=UserRead)
@@ -193,6 +216,39 @@ async def delete_user_endpoint(user_id: int, db: Session = Depends(get_db)):
     Returns success message.
     """
     return delete_user(user_id, db)
+
+
+@router.get("/me", response_model=UserRead)
+async def get_current_user_endpoint(current_user: User = Depends(get_current_user)):
+    """
+    Get current authenticated user.
+    
+    Requires valid JWT token in Authorization header.
+    
+    Returns current user data.
+    """
+    return UserRead.model_validate(current_user)
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(current_user: User = Depends(get_current_user)):
+    """
+    Refresh JWT token.
+    
+    Requires valid JWT token in Authorization header.
+    
+    Returns new JWT token with extended expiration.
+    """
+    # Create new JWT token
+    access_token = create_access_token(
+        data={"user_id": current_user.id, "email": current_user.email, "role": current_user.role.value}
+    )
+    
+    return TokenResponse(
+        access_token=access_token,
+        token_type="bearer",
+        user=UserRead.model_validate(current_user)
+    )
 
 
 @router.get("/health")
