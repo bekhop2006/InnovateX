@@ -58,6 +58,28 @@ services:
     restart: unless-stopped
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
+  # Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: innovatex_frontend
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - innovatex_network
+    restart: unless-stopped
+    command: npm run dev -- --host
+    profiles:
+      - frontend
+
   # PgAdmin (optional, for database management)
   pgadmin:
     image: dpage/pgadmin4:latest

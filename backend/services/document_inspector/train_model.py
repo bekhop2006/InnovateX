@@ -98,8 +98,19 @@ def train_yolo_model(
     print(f"   - mAP50-95: {metrics.box.map:.4f}")
     
     # Save the best model to models directory
-    project_root = Path(__file__).parent.parent.parent.parent
-    models_dir = project_root / "models"
+    script_path = Path(__file__).resolve()
+    project_root = script_path.parent.parent.parent.parent
+    
+    # If running in Docker, models dir is at /app/models
+    if Path("/app/models").exists():
+        models_dir = Path("/app/models")
+    elif (project_root / "models").exists():
+        models_dir = project_root / "models"
+    else:
+        models_dir = Path("models")
+        if not models_dir.exists():
+            models_dir = Path.cwd() / "models"
+    
     models_dir.mkdir(exist_ok=True)
     
     best_model_path = Path(output_dir) / "document_inspector" / "weights" / "best.pt"
@@ -211,9 +222,20 @@ def test_inference(model_path: str, test_image: str, output_dir: str = "runs/det
 
 def main():
     """Main execution function."""
-    # Paths
-    project_root = Path(__file__).parent.parent.parent.parent
-    dataset_dir = project_root / "dataset" / "yolo_dataset"
+    # Paths - try multiple locations
+    script_path = Path(__file__).resolve()
+    project_root = script_path.parent.parent.parent.parent
+    
+    # If running in Docker, dataset is at /app/dataset
+    if Path("/app/dataset/yolo_dataset").exists():
+        dataset_dir = Path("/app/dataset/yolo_dataset")
+    elif (project_root / "dataset" / "yolo_dataset").exists():
+        dataset_dir = project_root / "dataset" / "yolo_dataset"
+    else:
+        dataset_dir = Path("dataset/yolo_dataset")
+        if not dataset_dir.exists():
+            dataset_dir = Path.cwd() / "dataset" / "yolo_dataset"
+    
     data_yaml = dataset_dir / "data.yaml"
     
     # Check if dataset is prepared
@@ -239,7 +261,14 @@ def main():
     )
     
     # Evaluate trained model
-    models_dir = project_root / "models"
+    # Determine models directory
+    if Path("/app/models").exists():
+        models_dir = Path("/app/models")
+    elif (project_root / "models").exists():
+        models_dir = project_root / "models"
+    else:
+        models_dir = Path("models")
+    
     trained_model_path = models_dir / "document_inspector_yolo.pt"
     
     if trained_model_path.exists():

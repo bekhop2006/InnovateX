@@ -1,0 +1,152 @@
+:root {
+  --bg: #F2F2F2;
+  --cream: #EAE4D5;
+  --tan: #B6B09F;
+  --black: #000000;
+  --text: #000000;
+  --muted: #B6B09F;
+  --border: #000000;
+  --primary: #000000;
+  --danger: #000000;
+  --pop-pink: #FF6B9D;
+  --pop-yellow: #FFD93D;
+  --pop-blue: #6BCF7F;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body { 
+  margin: 0; 
+  background: var(--bg); 
+  color: var(--text); 
+  font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
+  font-weight: 900;
+}
+
+.app { 
+  min-height: 100%; 
+  display: flex; 
+  flex-direction: column; 
+}
+
+.app__header { 
+  padding: 24px 32px; 
+  border-bottom: 5px solid var(--black); 
+  background: var(--cream);
+  box-shadow: 0 8px 0 var(--black);
+}
+
+.app__header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.app__header h1 { 
+  margin: 0; 
+  font-size: 32px; 
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 3px 3px 0 var(--tan);
+}
+
+.app__mode-toggle {
+  display: flex;
+  gap: 8px;
+  border: 3px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.mode-btn {
+  padding: 12px 24px;
+  border: none;
+  background: white;
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(.active) {
+    background: var(--cream);
+  }
+
+  &.active {
+    background: var(--black);
+    color: white;
+  }
+
+  &:not(.active):hover {
+    background: var(--tan);
+  }
+}
+
+.app__main { 
+  flex: 1; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  padding: 32px;
+}
+
+.btn { 
+  background: var(--black); 
+  color: var(--cream); 
+  border: 4px solid var(--black); 
+  padding: 14px 24px; 
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: 14px;
+  letter-spacing: 1px;
+  box-shadow: 5px 5px 0 var(--tan);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 3px 3px 0 var(--tan);
+}
+
+.btn:active:not(:disabled) {
+  transform: translate(5px, 5px);
+  box-shadow: 0 0 0 var(--tan);
+}
+
+.btn:disabled { 
+  opacity: 0.5; 
+  cursor: not-allowed; 
+}
+
+.btn.secondary { 
+  background: var(--cream); 
+  color: var(--black);
+  border: 4px solid var(--black);
+}
+
+.btn.danger { 
+  background: var(--pop-pink);
+  color: var(--black);
+  box-shadow: 5px 5px 0 var(--black);
+}
+.input { 
+  display: inline-block;
+  padding: 12px;
+  border: 4px solid var(--black);
+  background: var(--cream);
+  font-weight: 900;
+  font-size: 14px;
+}
+
+@import './components/UploadCard.scss';
+@import './components/ResultsPanel.scss';
+@import './components/PdfViewer.scss';

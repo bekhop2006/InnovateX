@@ -1,0 +1,10 @@
+# Document Inspector Dataset
+path: /app/dataset/yolo_dataset  # dataset root dir
+train: images/train  # train images (relative to 'path')
+val: images/val  # val images (relative to 'path')
+
+# Classes
+names:
+  0: signature
+  1: stamp
+  2: qr

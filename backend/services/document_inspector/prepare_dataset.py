@@ -241,9 +241,22 @@ names:
 
 def main():
     """Main execution function."""
-    # Paths
-    project_root = Path(__file__).parent.parent.parent.parent
-    dataset_dir = project_root / "dataset"
+    # Paths - try multiple locations
+    script_path = Path(__file__).resolve()
+    # Try to find project root
+    project_root = script_path.parent.parent.parent.parent
+    
+    # If running in Docker, dataset is at /app/dataset
+    if Path("/app/dataset").exists():
+        dataset_dir = Path("/app/dataset")
+    elif (project_root / "dataset").exists():
+        dataset_dir = project_root / "dataset"
+    else:
+        # Try current working directory
+        dataset_dir = Path("dataset")
+        if not dataset_dir.exists():
+            dataset_dir = Path.cwd() / "dataset"
+    
     annotations_file = dataset_dir / "selected_annotations.json"
     pdf_dir = dataset_dir / "pdfs"
     output_dir = dataset_dir / "yolo_dataset"
