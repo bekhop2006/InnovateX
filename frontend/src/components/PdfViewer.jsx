@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf'
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css'
 import 'react-pdf/dist/esm/Page/TextLayer.css'
+import QRAnalyzer from './QRAnalyzer'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`
 
@@ -21,6 +22,7 @@ const PdfViewer = ({ file, pages, onClose }) => {
   const [expandedPages, setExpandedPages] = useState({})
   const [selectedItem, setSelectedItem] = useState(null)
   const [showSpotlight, setShowSpotlight] = useState(false)
+  const [showQRAnalyzer, setShowQRAnalyzer] = useState(false)
 
   const onThumbnailRenderSuccess = (pageNum, page) => {
     const viewport = page.getViewport({ scale: 1 })
@@ -56,6 +58,10 @@ const PdfViewer = ({ file, pages, onClose }) => {
 
   const pageOptions = pages.map((p, i) => ({ label: `Page ${i + 1}`, value: i }))
 
+  if (showQRAnalyzer) {
+    return <QRAnalyzer file={file} pages={pages} onClose={() => setShowQRAnalyzer(false)} />
+  }
+
   return (
     <div className="pdf-viewer">
       <div className="pdf-viewer__toolbar">
@@ -73,6 +79,7 @@ const PdfViewer = ({ file, pages, onClose }) => {
           <label><input type="checkbox" checked={visible.signature} onChange={(e) => setVisible((v) => ({ ...v, signature: e.target.checked }))} /> Signature</label>
           <label><input type="checkbox" checked={visible.stamp} onChange={(e) => setVisible((v) => ({ ...v, stamp: e.target.checked }))} /> Stamp</label>
         </div>
+        <button className="btn" onClick={() => setShowQRAnalyzer(true)}>Analyze QR Codes</button>
         <button className="btn" onClick={onClose}>Close</button>
       </div>
 
